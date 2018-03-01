@@ -51,8 +51,6 @@ dilution_fold = 10
 
 # Import Statements
 from opentrons import containers, instruments, robot
-from IPython.display import Image
-
 
 # In[46]:
 
@@ -73,6 +71,13 @@ trash = containers.load('trash-box', 'D1')
 # Supplies
 large_supplies = containers.load('tube-rack-15_50ml', 'C1')
 small_supplies = containers.load('tube-rack-2ml', 'C2')
+
+TE = large_supplies.wells('A3')
+dsDNA = small_supplies.wells('A1')
+standards = small_supplies.wells('A2','A3', 'A4', 'A5', 'A6')
+dilutedsDNA = small_supplies.wells('B1')
+
+print(standards[5])
 
 # Pipettes
 pipette_1000 = instruments.Pipette(axis='a', name='P1000',
@@ -98,33 +103,33 @@ pipette_10 = instruments.Pipette(axis='a', name='P10',
 
 if high_range:
     # Putting 1X TE in appropriate standard wells
-    pipette_1000.transfer(900, large_supplies('A3'), small_supplies('A3'))  # 100 ng/mL
-    pipette_1000.transfer(990, large_supplies('A3'), small_supplies('A4'))  # 10 ng/mL
-    pipette_1000.transfer(999, large_supplies('A3'), small_supplies('A5'))  # 1 ng/mL
-    pipette_1000.transfer(1000, large_supplies('A3'), small_supplies('A6'))  # 0 ng/mL
+    pipette_1000.transfer(900, TE, standards[1])  # 100 ng/mL
+    pipette_1000.transfer(990, TE, standards[2])  # 10 ng/mL
+    pipette_1000.transfer(999, TE, standards[3])  # 1 ng/mL
+    pipette_1000.transfer(1000, TE, standards[4])  # 0 ng/mL
 
     # Putting in 2 ug/mL DNA stock
-    pipette_1000.transfer(1000, small_supplies('A1'), small_supplies('A2'))  # 1 ug/mL
-    pipette_200.transfer(100, small_supplies('A1'), small_supplies('A3'), mix_after=(3, 50))  # 100 ng/mL
-    pipette_10.transfer(10, small_supplies('A1'), small_supplies('A4'), mix_after=(3, 10))  # 10 ng/mL
-    pipette_10.transfer(1, small_supplies('A1'), small_supplies('A5'), blow_out=True, mix_after=(3, 10))  # 1 ng/mL
+    pipette_1000.transfer(1000, dsDNA, standards[1])  # 1 ug/mL
+    pipette_200.transfer(100, dsDNA, standards[2], mix_after=(3, 50))  # 100 ng/mL
+    pipette_10.transfer(10, dsDNA, standards[3], mix_after=(3, 10))  # 10 ng/mL
+    pipette_10.transfer(1, dsDNA, standards[4], blow_out=True, mix_after=(3, 10))  # 1 ng/mL
 
 elif low_range:
     # Making 40-fold dilution of 2 ug/mL working solution (going into B1)
-    pipette_1000.transfer(1462.5, large_supplies('A3'), small_supplies('B1'))
-    pipette_200.trasnfer(37.5, small_supplies('A1'), small_supplies('B1'), mix_after=(3, 100))
+    pipette_1000.transfer(1462.5, TE, dilutedsDNA)
+    pipette_200.trasnfer(37.5, dsDNA, dilutedsDNA, mix_after=(3, 100))
 
     # Putting 1X TE in appropriate standard wells
-    pipette_1000.transfer(900, large_supplies('A3'), small_supplies('A3'))  # 2.5 ng/mL
-    pipette_1000.transfer(990, large_supplies('A3'), small_supplies('A4'))  # 250 pg/mL
-    pipette_1000.transfer(999, large_supplies('A3'), small_supplies('A5'))  # 25 pg/mL
-    pipette_1000.transfer(1000, large_supplies('A3'), small_supplies('A6'))  # 0 ng/mL
+    pipette_1000.transfer(900, TE, standards[1])  # 2.5 ng/mL
+    pipette_1000.transfer(990, TE, standards[2])  # 250 pg/mL
+    pipette_1000.transfer(999, TE, standards[3])  # 25 pg/mL
+    pipette_1000.transfer(1000, TE, standards[4])  # 0 ng/mL
 
     # Putting in 50 ng/mL DNA stock
-    pipette_1000.transfer(1000, small_supplies('B1'), small_supplies('A2'))  # 25 ug/mL
-    pipette_200.transfer(100, small_supplies('B1'), small_supplies('A3'), mix_after=(3, 50))  # 2.5 ng/mL
-    pipette_10.transfer(10, small_supplies('B1'), small_supplies('A4'), mix_after=(3, 10))  # 250 pg/mL
-    pipette_10.transfer(1, small_supplies('B1'), small_supplies('A5'), blow_out=True, mix_after=(3, 10))  # 25 pg/mL
+    pipette_1000.transfer(1000, dilutedsDNA, standards[0])  # 25 ug/mL
+    pipette_200.transfer(100, dilutedsDNA, standards[1], mix_after=(3, 50))  # 2.5 ng/mL
+    pipette_10.transfer(10, dilutedsDNA, standards[2], mix_after=(3, 10))  # 250 pg/mL
+    pipette_10.transfer(1, dilutedsDNA, standards[3], blow_out=True, mix_after=(3, 10))  # 25 pg/mL
 
 
 # In[51]:

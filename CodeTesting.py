@@ -13,8 +13,3 @@ f_primer = reagents.wells('A2', length=8)
 
 for well in f_primer:
     print(well)
-
-
-
-
-    
