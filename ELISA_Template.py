@@ -22,7 +22,7 @@ serial_dilution_samples = containers.load('tube-rack-2ml', 'A2')
 samples = containers.load('96-PCR-flat', 'A3')
 
 # Supplies and trash (supplies in B column, trash in D)
-wash_buffer = containers.load('point', 'B1')
+wash_buffer = containers.load('trough-1row-25ml', 'B1')
 reagents = containers.load('tube-rack-15_50ml', 'B2')
 # Bottom of tip container
 liquid_trash1 = containers.load('point', 'D1', 'liquid trash')
@@ -106,9 +106,40 @@ for i in range(11):
     new_tip='always')
 
 # 2.5 hour delay for incubation at room temperature
-delay(minutes=150)
+# delay(minutes=150)
+
+# Transfering all samples back to original wells for use in other tests
+for i in range(11):
+    # Reverse of the for loop above
+    p200_multi.transfer(100,
+    reaction_plate[8*(i+1):8*(i+2)],
+    samples[8*i:8*(i+1)],
+    new_tip='always')
+
+######################################################
+# Defining Wash Function
+
+def ElisaWash():
+    # Pick up set of tips used for wash steps (one set the entire time)
+    p200_multi.pick_up_tip(p200rack3)
+    for i in range(3):
+        # Repeats 4 times (through every well)
+            for i in range(12):
+                # Adds 300 uL wash buffer to each well
+                p200_multi.transfer(300, wash_buffer,
+                                    reaction_plate[8*i:8*(i+1)],
+                                    new_tip='never')
+            for i in range(12):
+                #Removes 300 uL wash buffer and puts in liquid trash_container
+                p200_multi.transfer(300, reaction_plate[8*i:8*(i+1)],
+                                liquid_trash1, new_tip='never')
+    # Drop tips off in waste after wash step
+    p200_multi.drop_tip(tip_trash)
+    return None
+
+ElisaWash()
 
 # Just for testing new pieces of code
-robot.clear_commands()
-for c in robot.commands():
-    print(c)
+#robot.clear_commands()
+#for c in robot.commands():
+    #print(c)
