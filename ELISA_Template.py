@@ -2,6 +2,9 @@
 
 # https://www.raybiotech.com/files/manual/ELISA/ELH-IL6.pdf
 
+# ALL DELAYS ARE COMMENTED TO SAVE DEBUGGING TIME, REMOVE BEFORE ACTUALLY
+# IMPLEMENTING
+
 ##############################################################################
 # Import Statements
 from opentrons import containers, instruments, robot
@@ -13,6 +16,7 @@ from opentrons import containers, instruments, robot
 p200rack = containers.load('tiprack-200ul', 'C1', 'p200-rack')
 p200rack2 = containers.load('tiprack-200ul', 'C2', 'p200-rack2')
 p200rack3 = containers.load('tiprack-200ul', 'C3', 'p200-rack3')
+p200rack4 = containers.load('tiprack-200ul', 'B3', 'p200-rack4')
 p1000rack = containers.load('tiprack-1000ul', 'D3', 'p1000-rack')
 
 # Assay Plate (dilution plate and actual ELISA plate) and samples in 96 well
@@ -31,9 +35,12 @@ tip_trash = containers.load('trash-box', 'D2', 'tip trash')
 diluentB = reagents.wells('A3')  # 50 mL conical
 detection_antibody = reagents.wells('A1')  # 15 mL conical
 HRP_strep = reagents.wells('B1')  # 15 mL conical
+TMB = reagents.wells('C1')  # 15 mL conical
+Stop = reagents.wells('A2')  # 15 mL conical
 # Standard stock is in C1 of serial plate, the dilution series will be in
 # The A1-A2 columns of this plate
 standard_stock = serial_dilution_samples.wells('A3')
+
 
 # Pipettes
 
@@ -43,7 +50,7 @@ p200_multi = instruments.Pipette(axis = 'a',
             min_volume=20,
             channels=8,
             trash_container=tip_trash,
-            tip_racks=[p200rack, p200rack2, p200rack3])
+            tip_racks=[p200rack, p200rack2, p200rack3, p200rack4])
 
 p1000 = instruments.Pipette(
             axis='a',
@@ -119,9 +126,19 @@ for i in range(11):
 ######################################################
 # Defining Wash Function
 
-def ElisaWash():
+def ElisaWash(option):
     # Pick up set of tips used for wash steps (one set the entire time)
     p200_multi.pick_up_tip(p200rack3)
+
+    if option == 'remove':
+        # Removes liquid already in wells
+        for i in range(12):
+            p200_multi.transfer(100,
+                reaction_plate[8*i:8*(i+1)], liquid_trash1)
+        # Drop tips
+        p200_multi.drop_tip(tip_trash)
+        # Pick up set of tips used for wash steps (one set the entire time)
+        p200_multi.pick_up_tip(p200rack3)
     for i in range(3):
         # Repeats 4 times (through every well)
             for i in range(12):
@@ -136,8 +153,45 @@ def ElisaWash():
     # Drop tips off in waste after wash step
     p200_multi.drop_tip(tip_trash)
     return None
+######################################################
+# First Wash Step
+ElisaWash(None)
 
-ElisaWash()
+######################################################
+# Antibody step
+# 100 uL into each well
+
+p1000.distribute(100, detection_antibody, reaction_plate)
+
+# 1 Hour delay
+#delay(minutes = 60)
+
+######################################################
+# Second Wash Step
+ElisaWash('remove')
+
+######################################################
+# HRP-Streptavadin step
+
+p1000.distribute(100, HRP_strep, reaction_plate)
+
+# 45 minute delay
+#delay(minutes = 45)
+
+######################################################
+# Third Wash Step
+ElisaWash('remove')
+
+######################################################
+# TMB One-Step Substrate 100 uL to each well
+
+p1000.distribute(100, TMB, reaction_plate)
+
+# Delay for 30 min
+#delay(minutes = 30)
+
+######################################################
+p1000.distribute(50, Stop, reaction_plate)
 
 # Just for testing new pieces of code
 #robot.clear_commands()
