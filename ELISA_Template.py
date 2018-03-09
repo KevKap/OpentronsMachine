@@ -17,7 +17,6 @@ p200rack = containers.load('tiprack-200ul', 'C1', 'p200-rack')
 p200rack2 = containers.load('tiprack-200ul', 'C2', 'p200-rack2')
 p200rack3 = containers.load('tiprack-200ul', 'C3', 'p200-rack3')
 p200rack4 = containers.load('tiprack-200ul', 'B3', 'p200-rack4')
-p1000rack = containers.load('tiprack-1000ul', 'D3', 'p1000-rack')
 
 # Assay Plate (dilution plate and actual ELISA plate) and samples in 96 well
 # These three plates are in A column
@@ -52,20 +51,11 @@ p200_multi = instruments.Pipette(axis = 'a',
             trash_container=tip_trash,
             tip_racks=[p200rack, p200rack2, p200rack3, p200rack4])
 
-p1000 = instruments.Pipette(
-            axis='a',
-            name='p1000',
-            max_volume=1000,
-            min_volume=100,
-            channels=1,
-            trash_container=tip_trash,
-            tip_racks=[p1000rack])
-
 p200 = instruments.Pipette(
         axis='a',
         name='p200',
         max_volume=200,
-        min_volume=20,
+        min_volume=0,
         channels=1,
         trash_container=tip_trash,
         tip_racks=[p200rack, p200rack2, p200rack3])
@@ -74,7 +64,7 @@ p200 = instruments.Pipette(
 # Standard Creation
 
 # First dispense 400 uL of diluent B to every well (440 in A1)
-p1000.distribute(400, diluentB, serial_dilution_samples.wells(length = 8),
+p200.distribute(400, diluentB, serial_dilution_samples.wells(length = 8),
                     disposal_vol=0)
 
 p200.transfer(40, diluentB, serial_dilution_samples.wells('A1'))
@@ -161,7 +151,7 @@ ElisaWash(None)
 # Antibody step
 # 100 uL into each well
 
-p1000.distribute(100, detection_antibody, reaction_plate)
+p200.distribute(100, detection_antibody, reaction_plate)
 
 # 1 Hour delay
 #delay(minutes = 60)
@@ -173,7 +163,7 @@ ElisaWash('remove')
 ######################################################
 # HRP-Streptavadin step
 
-p1000.distribute(100, HRP_strep, reaction_plate)
+p200.distribute(100, HRP_strep, reaction_plate)
 
 # 45 minute delay
 #delay(minutes = 45)
@@ -185,15 +175,15 @@ ElisaWash('remove')
 ######################################################
 # TMB One-Step Substrate 100 uL to each well
 
-p1000.distribute(100, TMB, reaction_plate)
+p200.distribute(100, TMB, reaction_plate)
 
 # Delay for 30 min
 #delay(minutes = 30)
 
 ######################################################
-p1000.distribute(50, Stop, reaction_plate)
+p200.distribute(50, Stop, reaction_plate)
 
 # Just for testing new pieces of code
 #robot.clear_commands()
-#for c in robot.commands():
-    #print(c)
+for c in robot.commands():
+    print(c)

@@ -10,7 +10,6 @@
 
 # Imports
 from opentrons import containers, instruments, robot
-from IPython.display import Image
 
 
 # #### Supply Initialization
