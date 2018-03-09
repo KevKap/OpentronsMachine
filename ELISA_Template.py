@@ -52,7 +52,7 @@ p200_multi = instruments.Pipette(axis = 'a',
             tip_racks=[p200rack, p200rack2, p200rack3, p200rack4])
 
 p200 = instruments.Pipette(
-        axis='a',
+        axis='b',
         name='p200',
         max_volume=200,
         min_volume=0,
