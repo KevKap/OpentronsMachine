@@ -38,14 +38,16 @@ p300_multi = instruments.Pipette(
         trash_container=tip_trash,
         tip_racks=[tip_rack200])
 
-p200 = instruments.Pipette(
+p1000 = instruments.Pipette(
         axis='b',
-        name='p200',
-        max_volume=200,
+        name='p1000',
+        max_volume=1000,
         min_volume=0,
         channels=1,
         trash_container=tip_trash,
-        tip_racks=[tip_rack200])
+        tip_racks=[tip_rack1000])
+
+###############################################################################
 
 ###############################################################################
 # Actual code
@@ -56,7 +58,7 @@ dilution_list = [200, 175, 150, 125, 100, 75, 50, 25]
 
 # Blue dispensation (gets new tip each time)
 for i in range(len(dilution_list)):
-    p200.transfer(dilution_list[i], blueColor, well_plate96[i])
+    p1000.transfer(dilution_list[i], blueColor, well_plate96[i])
 
 # Water dispensation (gets new tip and mixes each time)
 for i in range(1,len(dilution_list)):
