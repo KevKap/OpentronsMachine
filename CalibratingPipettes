@@ -1,0 +1,28 @@
+from opentrons import robot, instruments, containers
+
+#Input pipette max range
+pipette_type = 1000
+
+
+low_range = pipette_type / 10
+
+tubes = containers.load('tube-rack-2ml','A2')
+tip_trash = containers.load('trash-box', 'B2')
+
+tip_rack1000 = containers.load('tiprack-1000ul', 'B1')
+pipette = instruments.Pipette(
+        axis='b',
+        name='pipette',
+        max_volume=pipette_type,
+        min_volume=0,
+        channels=1,
+        trash_container=tip_trash,
+        tip_racks=[tip_rack1000])
+
+
+tube_rack15_50mL = containers.load('tube-rack-15_50ml', 'A1')
+water = tube_rack15_50mL.wells('A3')
+
+
+for i in range(1, 11):
+    pipette.transfer(low_range * i, water, tubes[i])
